@@ -429,6 +429,7 @@ GradingTools::GradingTools(int part, wxWindow *parent, std::string templateFilen
   m_templateFilename(templateFilename)
 {
   m_part = part;
+  m_partString = (m_part == 1)?"I":((m_part == 2)?"II-1":"II-2");
   m_totalPoints = 0;
 
   m_panel = new GradingPanel(this, &m_totalPoints);
@@ -481,7 +482,7 @@ void GradingTools::SaveScoreSheet()
 
   char buffer[512];
 
-  sprintf(buffer, "Part %s (%s points total)", (m_part == 1)?"I":((m_part == 2)?"II":"II-2"), formatFloat(m_maxPoints));
+  sprintf(buffer, "Part %s (%s points total)", m_partString.c_str(), formatFloat(m_maxPoints));
   fprintf(f, "\n%s\n", buffer);
 
   for (unsigned int i = 0; i < strlen(buffer); i++)
@@ -503,8 +504,8 @@ void GradingTools::SaveScoreSheet()
   if (m_panel->GetNotes().length() > 0)
     fprintf(f, "Note: %s\n\n", m_panel->GetNotes().c_str());
 
-  fprintf(f, "late penalty for part %s (if any): \n", (m_part == 1)?"I":"II");
-  fprintf(f, "total for part %s: %s\n", (m_part == 1)?"I":"II", formatFloat(m_totalPoints));
+  fprintf(f, "late penalty for part %s (if any): \n", m_partString.c_str());
+  fprintf(f, "total for part %s: %s\n", m_partString.c_str(), formatFloat(m_totalPoints));
 
   fprintf(f, "\nTotal: \n");
 

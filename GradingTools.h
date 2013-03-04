@@ -128,6 +128,7 @@ class GradingTools: public wxPanel
   std::string m_filename;
   std::string m_templateFilename;
   int m_part;
+  std::string m_partString;
 
   float m_totalPoints;
   float m_maxPoints;
