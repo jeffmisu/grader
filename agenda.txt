@@ -1,0 +1,5 @@
+grades marked with 'no submission' will not be properly read back from the .ss
+
+syntax highlighting with scintilla
+
+what would be REAL NICE is the ability to make a one-off deduction, or modify the template

@@ -1,0 +1,7 @@
+
+grdicon ICON "icon.ico"
+
+next BITMAP "bitmaps/next.bmp"
+prev BITMAP "bitmaps/prev.bmp"
+save BITMAP "bitmaps/save.bmp"
+auto BITMAP "bitmaps/auto.bmp"
