@@ -2,22 +2,22 @@
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Release" />
 	<File name="Grader.cpp" open="1" top="0" tabpos="1">
-		<Cursor position="1978" topLine="71" />
+		<Cursor position="6308" topLine="205" />
 	</File>
 	<File name="Grader.h" open="1" top="0" tabpos="2">
 		<Cursor position="36" topLine="0" />
 	</File>
-	<File name="GradingTools.cpp" open="1" top="0" tabpos="3">
-		<Cursor position="2670" topLine="110" />
+	<File name="GradingTools.cpp" open="1" top="1" tabpos="3">
+		<Cursor position="92" topLine="0" />
 	</File>
 	<File name="GradingTools.h" open="1" top="0" tabpos="4">
-		<Cursor position="396" topLine="30" />
+		<Cursor position="1782" topLine="40" />
 	</File>
-	<File name="TemplateMaker.cpp" open="1" top="1" tabpos="5">
-		<Cursor position="628" topLine="0" />
+	<File name="TemplateMaker.cpp" open="1" top="0" tabpos="5">
+		<Cursor position="9277" topLine="286" />
 	</File>
 	<File name="TemplateMaker.h" open="1" top="0" tabpos="6">
-		<Cursor position="132" topLine="0" />
+		<Cursor position="132" topLine="52" />
 	</File>
 	<File name="toolbar.rc" open="0" top="0" tabpos="5">
 		<Cursor position="20" topLine="0" />

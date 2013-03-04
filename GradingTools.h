@@ -143,7 +143,7 @@ class GradingTools: public wxPanel
   void SaveScoreSheet();
   void SaveScoreFile();
 
-  void OpenFiles(bool build = false);
+  void OpenFiles(bool build);
   void BuildCategories(std::string content);
   void ParseScoreSheet(std::string content);
 

@@ -47,6 +47,7 @@ GradingDeduction &GradingDeduction::operator=(const GradingDeduction &d)
   m_mapping = d.m_mapping;
   m_choices = d.m_choices;
   m_recorded = d.m_recorded;
+  m_checkboxes = d.m_checkboxes;
 
   return *this;
 }
@@ -495,7 +496,7 @@ void GradingTools::SaveScoreSheet()
 
   for (unsigned int i = 0; i < m_categories.size() - 1; i++)
   {
-    fprintf(f, "%s %s\n", formatFloat(m_categories[i].m_value), m_categories[i].m_label.c_str());
+    fprintf(f, "%s\n", m_categories[i].m_label.c_str());
     for (unsigned int j = 0; j < m_categories[i].m_dedux.size(); j++)
       fprintf(f, "%s", m_categories[i].m_dedux[j].Print().c_str());
     fprintf(f, "\n");
@@ -518,7 +519,7 @@ void GradingTools::SaveScoreFile()
 {
   std::ofstream f((m_filename.substr(0, m_filename.find_last_of('.')) + ".ss").c_str(), std::ios::out);
 
-  for (size_t i = 0; i < m_categories.size() - 1; i++)
+  for (size_t i = 0; i < m_categories.size(); i++)
     f << m_categories[i].ToString() << "\n";
 
   f << "\nNOTES\n" << m_panel->GetNotes();
@@ -600,15 +601,20 @@ void GradingTools::ParseScoreSheet(std::string content)
       if (cat != NULL)
       {
         if (ded != NULL)
+        {
           cat->AddDeduction(*ded);
+          delete ded;
+          ded = NULL;
+        }
         m_categories.push_back(*cat);
+        delete cat;
+        cat = NULL;
       }
 
       float value;
       sscanf(line.c_str(), "CAT [%f]", &value);
       std::string label(&line[line.find_last_of(']')] + 2);
       cat = new GradingCategory(value, label, std::vector<GradingDeduction>());
-      ded = NULL;
     }
     // Deduction
     else if (line[line.find_first_not_of('\t')] == 'D')
@@ -616,7 +622,11 @@ void GradingTools::ParseScoreSheet(std::string content)
       cBox.ded++;
       cBox.crt = -1;
       if (ded != NULL)
+      {
         cat->AddDeduction(*ded);
+        delete ded;
+        ded = NULL;
+      }
 
       // If this deduction is simple and applied, remember to check its box later
       if (line[line.find('[') + 1] == 'X')
@@ -664,17 +674,19 @@ void GradingTools::ParseScoreSheet(std::string content)
   if (cat != NULL)
   {
     if (ded != NULL)
+    {
       cat->AddDeduction(*ded);
+      delete ded;
+      ded = NULL;
+    }
     m_categories.push_back(*cat);
+    delete cat;
+    cat = NULL;
   }
 
   m_maxPoints = 0;
-  for (size_t i = 0; i < m_categories.size(); i++)
+  for (size_t i = 0; i < m_categories.size() - 1; i++)
     m_maxPoints += m_categories[i].m_value;
-
-  ded = new GradingDeduction("no submission");
-  ded->SetMapping(1, -m_maxPoints);
-  m_categories.push_back(GradingCategory(m_maxPoints, "points total", std::vector<GradingDeduction>(1, *ded)));
 
   for (unsigned int i = 0; i < m_categories.size(); i++)
     m_panel->AddCategory(m_categories[i]);
@@ -702,7 +714,7 @@ void GradingTools::UpdateDirectory()
   m_categories.clear();
   m_panel->Reset();
 
-  OpenFiles();
+  OpenFiles(false);
 
   GetSizer()->Layout();
   GetSizer()->SetSizeHints(m_parent);

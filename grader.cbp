@@ -9,9 +9,8 @@
 			<Target title="Release">
 				<Option output="bin\grader" prefix_auto="1" extension_auto="1" />
 				<Option object_output="obj\Release\" />
-				<Option type="1" />
+				<Option type="0" />
 				<Option compiler="gcc" />
-				<Option use_console_runner="0" />
 				<Option projectLinkerOptionsRelation="2" />
 				<Linker>
 					<Add library="libwx_msw_core-2.8.dll.a" />
@@ -29,8 +28,6 @@
 			<Add option="-D__GNUWIN32__" />
 			<Add option="-D__WXMSW__" />
 			<Add option="-DWXUSINGDLL" />
-			<Add directory="C:\Users\Jeff\Desktop\wxWidgets-2.8.12\include" />
-			<Add directory="C:\Users\Jeff\Desktop\wxWidgets-2.8.12\contrib\include" />
 			<Add directory="C:\CodeBlocks\projects\common\2d" />
 		</Compiler>
 		<ResourceCompiler>
@@ -39,6 +36,7 @@
 		<Linker>
 			<Add option="-mthreads" />
 			<Add option="-static" />
+			<Add directory="C:\CodeBlocks\lib\wx" />
 		</Linker>
 		<Unit filename="Grader.cpp" />
 		<Unit filename="Grader.h" />

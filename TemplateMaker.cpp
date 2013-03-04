@@ -293,8 +293,18 @@ void TemplateMaker::SaveTemplate()
     filename = f->GetPath();
     std::ofstream f(filename.c_str(), std::ios::out);
 
+    float maxPoints = 0;
+
     for (size_t i = 0; i < m_categories.size(); i++)
+    {
       f << m_categories[i]->GetGradingCategory().ToString() << "\n";
+      maxPoints += m_categories[i]->GetGradingCategory().m_value;
+    }
+
+    // Create the 'no submission' deduction/category
+    GradingDeduction ded("no submission");
+    ded.SetMapping(1, -maxPoints);
+    f << GradingCategory(maxPoints, "points total", std::vector<GradingDeduction>(1, ded)).ToString();
   }
   delete f;
 }
