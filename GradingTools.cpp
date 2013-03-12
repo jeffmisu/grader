@@ -22,7 +22,66 @@ char *formatFloat(float x)
   return s;
 }
 
-//-----
+//-----GradingString-----
+
+GradingString::GradingString():
+  m_precedes(0),
+  m_owner(NULL)
+{
+}
+
+GradingString::GradingString(std::string text, int precedes, GradingTools *owner):
+  m_text(text),
+  m_precedes(precedes),
+  m_owner(owner)
+{
+}
+
+GradingString::GradingString(const GradingString &s)
+{
+  *this = s;
+}
+
+GradingString &GradingString::operator=(const GradingString &s)
+{
+  m_text = s.m_text;
+  m_precedes = s.m_precedes;
+  m_owner = s.m_owner;
+
+  return *this;
+}
+
+std::string GradingString::Print() const
+{
+  std::stringstream ssIn(m_text);
+  std::stringstream ssOut;
+
+  bool notFirst = false;
+  while (ssIn.good())
+  {
+    std::string tok;
+    getline(ssIn, tok, '%');
+    if (notFirst)
+    {
+      if (tok[0] == 't')
+        ssOut << formatFloat(m_owner->GetTotalPoints()) << tok.substr(1);
+      else if (tok[0] == 'm')
+        ssOut << formatFloat(m_owner->GetMaxPoints()) << tok.substr(1);
+    }
+    else
+      ssOut << tok;
+    notFirst = true;
+  }
+
+  return ssOut.str();
+}
+
+std::string GradingString::ToString() const
+{
+  return "STR " + m_text;
+}
+
+//-----GradingDeduction-----
 
 GradingDeduction::GradingDeduction()
 {
@@ -83,7 +142,7 @@ void GradingDeduction::SetMapping(int index, float value)
   m_mapping[index] = value;
 }
 
-float GradingDeduction::GetValue()
+float GradingDeduction::GetValue() const
 {
   int t = 0;
 
@@ -102,7 +161,7 @@ float GradingDeduction::GetValue()
   return m_mapping[t];
 }
 
-float GradingDeduction::GetMaxValue()
+float GradingDeduction::GetMaxValue() const
 {
   return m_mapping[m_mapping.size() - 1];
 }
@@ -118,7 +177,7 @@ void GradingDeduction::AddChoice(std::string label)
   m_choices.push_back(label);
 }
 
-std::string GradingDeduction::Print()
+std::string GradingDeduction::Print() const
 {
   std::stringstream s;
 
@@ -186,7 +245,7 @@ wxSizer *GradingDeduction::BuildPanel(wxWindow *parent, int *currentID)
   return sizer;
 }
 
-std::string GradingDeduction::ToString()
+std::string GradingDeduction::ToString() const
 {
   std::stringstream str;
   str << "\tDED ";
@@ -206,7 +265,7 @@ std::string GradingDeduction::ToString()
   return str.str();
 }
 
-//-----
+//-----GradingCategory-----
 
 GradingCategory::GradingCategory()
 {
@@ -257,7 +316,7 @@ void GradingCategory::Reset()
     m_dedux[i].Reset();
 }
 
-std::string GradingCategory::ToString()
+std::string GradingCategory::ToString() const
 {
   std::stringstream str;
   str << "CAT [" << m_value << "] " << m_label;
@@ -267,7 +326,7 @@ std::string GradingCategory::ToString()
   return str.str();
 }
 
-//-----
+//-----GradingPanel-----
 
 IMPLEMENT_CLASS(GradingPanel, wxScrolledWindow)
 
@@ -371,7 +430,7 @@ void GradingPanel::Reset()
   m_currentID = ID_DEDUCTION;
 }
 
-//-----
+//-----GradingText-----
 
 IMPLEMENT_CLASS(GradingText, wxRichTextCtrl)
 
@@ -418,7 +477,7 @@ void GradingText::Save()
 {
 }
 
-//-----
+//-----GradingTools-----
 
 IMPLEMENT_CLASS(GradingTools, wxPanel)
 
@@ -477,50 +536,67 @@ void GradingTools::LoadScoreSheet(std::string filename, bool build)
   fclose(f);
 }
 
+// SaveScoreSheet prints out the grade file as it is meant to be returned to the student.
 void GradingTools::SaveScoreSheet()
 {
   FILE *f = fopen(m_filename.c_str(), "w+");
 
   char buffer[512];
-
+/*
   sprintf(buffer, "Part %s (%s points total)", m_partString.c_str(), formatFloat(m_maxPoints));
   fprintf(f, "\n%s\n", buffer);
 
   for (unsigned int i = 0; i < strlen(buffer); i++)
     fprintf(f, "-");
   fprintf(f, "\n");
-
-  // Special case for no submission
-  if (m_categories[m_categories.size() - 1].m_dedux[0].GetValue() != 0.0f)
-    fprintf(f, "%s %s\n\n", formatFloat(-m_maxPoints), m_categories[m_categories.size() - 1].m_dedux[0].m_label.c_str());
-
+*/
+  int strInd = 0;
   for (unsigned int i = 0; i < m_categories.size() - 1; i++)
   {
+    while (strInd < m_strings.size() && m_strings[strInd].m_precedes <= i)
+      fprintf(f, "%s\n", m_strings[strInd++].Print().c_str());
     fprintf(f, "%s\n", m_categories[i].m_label.c_str());
     for (unsigned int j = 0; j < m_categories[i].m_dedux.size(); j++)
       fprintf(f, "%s", m_categories[i].m_dedux[j].Print().c_str());
     fprintf(f, "\n");
   }
 
+  // Special case for no submission
+  if (m_categories[m_categories.size() - 1].m_dedux[0].GetValue() != 0.0f)
+    fprintf(f, "%s %s\n\n", formatFloat(-m_maxPoints), m_categories[m_categories.size() - 1].m_dedux[0].m_label.c_str());
+
   if (m_panel->GetNotes().length() > 0)
     fprintf(f, "Note: %s\n\n", m_panel->GetNotes().c_str());
 
+  while (strInd < m_strings.size())
+    fprintf(f, "%s\n", m_strings[strInd++].Print().c_str());
+/*
   fprintf(f, "late penalty for part %s (if any): \n", m_partString.c_str());
   fprintf(f, "total for part %s: %s\n", m_partString.c_str(), formatFloat(m_totalPoints));
 
   fprintf(f, "\nTotal: \n");
-
+*/
   fclose(f);
 
   SaveScoreFile();
 }
 
+// SaveScoreFile records grading information in the same format as templates, with
+// applied deductions marked and notes included.
 void GradingTools::SaveScoreFile()
 {
   std::ofstream f((m_filename.substr(0, m_filename.find_last_of('.')) + ".ss").c_str(), std::ios::out);
 
+  int strInd = 0;
   for (size_t i = 0; i < m_categories.size(); i++)
+  {
+    while (strInd < m_strings.size() && m_strings[strInd].m_precedes <= i)
+      f << m_strings[strInd++].ToString() << "\n";
     f << m_categories[i].ToString() << "\n";
+  }
+
+  while (strInd < m_strings.size())
+    f << m_strings[strInd++].ToString() << "\n";
 
   f << "\nNOTES\n" << m_panel->GetNotes();
 }
@@ -593,11 +669,9 @@ void GradingTools::ParseScoreSheet(std::string content)
   {
     getline(sheet, line);
 
-    // Category
-    if (line[0] == 'C')
+    // Categories and strings force the pending category to resolve
+    if (line[0] == 'C' || line[0] == 'S')
     {
-      cBox.cat++;
-      cBox.ded = cBox.crt = -1;
       if (cat != NULL)
       {
         if (ded != NULL)
@@ -611,10 +685,18 @@ void GradingTools::ParseScoreSheet(std::string content)
         cat = NULL;
       }
 
-      float value;
-      sscanf(line.c_str(), "CAT [%f]", &value);
-      std::string label(&line[line.find_last_of(']')] + 2);
-      cat = new GradingCategory(value, label, std::vector<GradingDeduction>());
+      if (line[0] == 'C')
+      {
+        cBox.cat++;
+        cBox.ded = cBox.crt = -1;
+
+        float value;
+        sscanf(line.c_str(), "CAT [%f]", &value);
+        std::string label(&line[line.find_last_of(']')] + 2);
+        cat = new GradingCategory(value, label, std::vector<GradingDeduction>());
+      }
+      else
+        m_strings.push_back(GradingString((line.length() > 4)?(line.substr(4)):(""), m_categories.size(), this));
     }
     // Deduction
     else if (line[line.find_first_not_of('\t')] == 'D')
@@ -707,11 +789,22 @@ void GradingTools::SetDeductionBox(int category, int deduction, int box, bool st
   m_categories[category].SetDeductionBox(deduction, box, state);
 }
 
+float GradingTools::GetTotalPoints() const
+{
+  return m_totalPoints;
+}
+
+float GradingTools::GetMaxPoints() const
+{
+  return m_maxPoints;
+}
+
 void GradingTools::UpdateDirectory()
 {
   m_totalPoints = 0;
 
   m_categories.clear();
+  m_strings.clear();
   m_panel->Reset();
 
   OpenFiles(false);

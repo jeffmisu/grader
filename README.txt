@@ -53,6 +53,7 @@ it in person. I'm just going to address some things that might come up:
   The source code is included in the repository. It's not amazing, but if you
   have some reason to use it, go ahead. You could also build the program for
   yourself/a different platform, in which case you'd need wxWidgets 2.8, and
-  a lot of luck, probably.
+  a lot of luck, probably. I use CodeBlocks as my IDE, and the project file
+  (grader.cbp) is included.
 
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -

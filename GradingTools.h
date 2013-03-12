@@ -9,6 +9,40 @@
 #include <wx/spinctrl.h>
 #include <wx/richtext/richtextctrl.h>
 
+// Strings are simply put into the output grade file literally, with a few
+// bells and whistles for formatting.
+//   %t - Replaced with the student's total earned points.
+//   %m - Replaced with the assignment's maximum point value.
+
+class GradingTools;
+
+class GradingString
+{
+  public:
+  GradingString();
+  GradingString(std::string text, int precedes, GradingTools *owner);
+  GradingString(const GradingString &s);
+
+  GradingString &operator=(const GradingString &s);
+
+  std::string m_text;
+
+  // The 'precedes' value indicates which category (by index) this
+  // string should immediately precede in the output. If two strings
+  // have the same value, they are written in the order they were
+  // read from the template.
+  int m_precedes;
+
+  GradingTools *m_owner;
+
+  std::string Print() const;
+  std::string ToString() const;
+};
+
+// Deductions are the components of the grade that subtract points. Each one
+// has a condition and a point value; the understanding is that when the condition
+// is met, the (usually negative) point value is added to the student's score.
+
 class GradingDeduction
 {
   public:
@@ -28,18 +62,22 @@ class GradingDeduction
   void SetLabel(std::string label);
   void SetCheckbox(int index, bool state);
   void SetMapping(int index, float value);
-  float GetValue();
-  float GetMaxValue();
+  float GetValue() const;
+  float GetMaxValue() const;
 
   void UpdateTotal(float *total);
   void AddChoice(std::string label);
-  std::string Print();
+  std::string Print() const;
   void Reset();
 
   wxSizer *BuildPanel(wxWindow *parent, int *currentID);
 
-  std::string ToString();
+  std::string ToString() const;
 };
+
+// Categories are the level up from deductions. They have a description and total
+// point value, and house any number of deductions that are relevant. These would
+// usually be problems in an assignment, or pieces of particularly large problems.
 
 class GradingCategory
 {
@@ -59,7 +97,7 @@ class GradingCategory
   void SetDeductionBox(int deduction, int box, bool state);
   void Reset();
 
-  std::string ToString();
+  std::string ToString() const;
 };
 
 class GradingPanel: public wxScrolledWindow
@@ -133,6 +171,7 @@ class GradingTools: public wxPanel
   float m_totalPoints;
   float m_maxPoints;
 
+  std::vector<GradingString> m_strings;
   std::vector<GradingCategory> m_categories;
 
   public:
@@ -148,6 +187,8 @@ class GradingTools: public wxPanel
   void ParseScoreSheet(std::string content);
 
   void SetDeductionBox(int category, int deduction, int box, bool state);
+  float GetTotalPoints() const;
+  float GetMaxPoints() const;
 
   void UpdateDirectory();
 

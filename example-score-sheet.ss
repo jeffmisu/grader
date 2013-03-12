@@ -1,33 +1,75 @@
-CAT [1] 1a: 1 point
-	DED [O] [-0.5] i   incorrect/missing/incomplete
-	DED [O] [-0.5] ii  incorrect/missing/incomplete
-CAT [2] 1b: 2 points
-	DED [O] [-0.5] b.i.   incorrect/missing/incomplete
-	DED [O] [-0.5] b.ii.  incorrect/missing/incomplete
-	DED [O] [-0.5] b.iii. incorrect/missing/incomplete
-	DED [O] [-0.5] b.iv.  incorrect/missing/incomplete
-CAT [3] 2a: 3 points
-	DED [O] [-3] not submitted
-	DED [O] [-1] missing "class" in header
-	DED [O] [-1] missing main method header
-	DED [O] [-1] missing { at start and/or end of main method
-	DED [O] [-1] missing semi-colon at end of first println
-	DED [O] [-1] made incorrect/unnecessary change
-CAT [3] 2b: 3 points
-	DED [O] [-3] not submitted
-	DED [O] [-1] missing one of the invalid identifiers
-	DED [O] [-1] one valid identifier was mislabeled as invalid
-	DED [O] [-2] two or more mistakes
-	DED [O] [-1] missing one or more explanation of why an identifier is invalid
-CAT [3] 2c: 3 points
-	DED [O] [-3] not submitted
-	DED [O] [-3] three or more mistakes
-	DED [O] [-2] two mistakes (e.g., missing two escape characters)
-	DED [O] [-1] one mistake (e.g., missing one escape character)
-CAT [3] 3: 3 points
-	DED [O] [-3] not submitted
-	DED [O] [-3] three or more mistakes in output
-	DED [O] [-2] two mistakes in output
-	DED [O] [-1] one mistake in output
-CAT [15] 15 points total
-	DED [O] [-15] no submission
+STR
+STR Part II (%m points total)
+STR -------------------------
+STR
+STR problem 3 (20 points total)
+STR ---------------------------
+CAT [5] 5 points for part a (printEveryOther)
+	DED [O] [-5] missing
+	DED [O] [-4] class does not compile, and method has multiple problems
+	DED [O] [-2.5] class does not compile, but method looks mostly correct
+	DED [O] [-2, -3] prints incorrect value or crashes in some cases:
+		CRT [O] test 1: string has an even length ("method")
+		CRT [O] test 2: string has an odd length ("programming")
+	DED [O] [-2] incorrect parameter list: should take a single String
+	DED [O] [-2] incorrect return type: should be void
+	DED [O] [-1.5] incorrect method name
+CAT [5] 5 points for part b (printDiagonal)
+	DED [O] [-5] missing
+	DED [O] [-4] class does not compile, and method has multiple problems
+	DED [O] [-2.5] class does not compile, but method looks mostly correct
+	DED [O] [-1] prints incorrect number of spaces
+	DED [O] [-2, -3] prints incorrect value or crashes in some cases:
+		CRT [O] test 1: string has an even length ("diagonal")
+		CRT [O] test 2: string has an odd length ("programming")
+	DED [O] [-2] incorrect parameter list: should take a single String
+	DED [O] [-2] incorrect return type: should be void
+	DED [O] [-1.5] incorrect method name
+CAT [5] 5 points for part c (longerLength)
+	DED [O] [-5] missing
+	DED [O] [-4] class does not compile, and method has multiple problems
+	DED [O] [-2.5] class does not compile, but method looks mostly correct
+	DED [O] [-2, -3] returns incorrect value or crashes in some cases:
+		CRT [O] test 1: first string is longer
+		CRT [O] test 2: second string is longer
+		CRT [O] test 3: strings have the same length
+	DED [O] [-2] prints result instead of returning it
+	DED [O] [-2] incorrect parameter list: should take two Strings
+	DED [O] [-2] incorrect return type: should be int
+	DED [O] [-1.5] incorrect method name
+CAT [5] 5 points for part d (interleave)
+	DED [O] [-5] missing
+	DED [O] [-4] class does not compile, and method has multiple problems
+	DED [O] [-2.5] class does not compile, but method looks mostly correct
+	DED [O] [-2] returns incorrect value or crashes when strings have same length
+	DED [O] [-1] returns incorrect value or crashes when first string is longer
+	DED [O] [-1] returns incorrect value or crashes when second string is longer
+	DED [O] [-2] prints result instead of returning it
+	DED [O] [-2] incorrect parameter list: should take two Strings
+	DED [O] [-2] incorrect return type: should be String
+	DED [O] [-1.5] incorrect method name
+STR problem 4 (10 points total)
+STR ---------------------------
+CAT [2] 2 points for programming style
+	DED [O] [-1] one or more of the new methods do not have comments
+	DED [O] [-1] incorrect indenting
+	DED [O] [-1] other issue:
+CAT [3] 3 points for dayNumber method
+	DED [O] [-3] not implemented
+	DED [O] [-2] cannot test (perhaps because of incorrect header)
+	DED [O] [-1.5] fails one or more test
+CAT [3] 3 points for dayOfWeek method
+	DED [O] [-3] not implemented
+	DED [O] [-2] cannot test (perhaps because of incorrect header)
+	DED [O] [-1.5] fails one or more test
+CAT [2] 2 points for correct main method
+	DED [O] [-2] main method was not changed
+	DED [O] [-2] program does not correctly read and process user inputs
+	DED [O] [-1] Scanner object is not created on the first line of the main method
+CAT [30] points total
+	DED [O] [-30] no submission
+STR late penalty (if any): 
+STR total for part II: %t
+STR
+STR Total: 
+STR
