@@ -1,0 +1,17 @@
+{
+  name: Part I
+  submissions: *_part?.*
+  grade: *-a.txt
+}
+
+{
+  name: Part II-1
+  submissions: *.java
+  grade: *-b.txt
+}
+
+{
+  name: Part II-2
+  submissions: *.java
+  grade: *-c.txt
+}
