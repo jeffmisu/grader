@@ -166,7 +166,6 @@ class GradingTools: public wxPanel
   std::string m_filename;
   std::string m_templateFilename;
   int m_part;
-  std::string m_partString;
 
   float m_totalPoints;
   float m_maxPoints;
@@ -174,9 +173,19 @@ class GradingTools: public wxPanel
   std::vector<GradingString> m_strings;
   std::vector<GradingCategory> m_categories;
 
+  struct sAssignmentPart
+  {
+    std::string name;
+    std::string submissionFilter;
+    std::string gradeFileFilter;
+  };
+  static std::vector<sAssignmentPart> s_assmtParts;
+
   public:
   GradingTools(int part, wxWindow *parent, std::string templateFilename);
   ~GradingTools();
+
+  static std::vector<wxString> GetAssignmentParts();
 
   void LoadScoreSheet(std::string filename, bool build = false);
   void SaveScoreSheet();

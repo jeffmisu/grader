@@ -189,7 +189,8 @@ std::string GradingDeduction::Print() const
   else
   {
     std::string label = m_label;
-    int t = 0, ind = 0;
+    int t = 0;
+    //int ind = 0;
     for (unsigned int i = 0; i < m_checkboxes.size(); i++)
       if (m_checkboxes[i]->GetValue())
         t++;
@@ -484,12 +485,13 @@ IMPLEMENT_CLASS(GradingTools, wxPanel)
 BEGIN_EVENT_TABLE(GradingTools, wxPanel)
 END_EVENT_TABLE()
 
+std::vector<GradingTools::sAssignmentPart> GradingTools::s_assmtParts;
+
 GradingTools::GradingTools(int part, wxWindow *parent, std::string templateFilename):
   wxPanel(parent),
   m_templateFilename(templateFilename)
 {
   m_part = part;
-  m_partString = (m_part == 1)?"I":((m_part == 2)?"II-1":"II-2");
   m_totalPoints = 0;
 
   m_panel = new GradingPanel(this, &m_totalPoints);
@@ -509,6 +511,52 @@ GradingTools::GradingTools(int part, wxWindow *parent, std::string templateFilen
 
 GradingTools::~GradingTools()
 {
+}
+
+#include <iostream>
+std::vector<wxString> GradingTools::GetAssignmentParts()
+{
+  if (s_assmtParts.size() == 0)
+  {
+    std::ifstream conf("parts_conf.txt", std::ios::in);
+    std::string tok;
+    sAssignmentPart *part = NULL;
+    while (conf.good())
+    {
+      conf >> tok;
+      if (tok[0] == '{')
+      {
+        sAssignmentPart p = {"[no name]", "*.*", "*.*"};
+        s_assmtParts.push_back(p);
+        part = &s_assmtParts[s_assmtParts.size() - 1];
+      }
+      else if (tok[0] != '}' && s_assmtParts.size() == 0)
+        wxMessageBox("The assignment parts description file is malformed.", "Error!", wxOK, NULL);
+
+      std::string *target = NULL;
+      if (tok == "name:")
+        target = &part->name;
+      else if (tok == "submissions:")
+        target = &part->submissionFilter;
+      else if (tok == "grade:")
+        target = &part->gradeFileFilter;
+
+      if (target == NULL)
+        continue;
+
+      getline(conf, *target);
+      size_t found = target->find_first_not_of(" \t");
+      if (found != std::string::npos)
+        *target = target->substr(found);
+      else
+        target->clear();
+    }
+  }
+
+  std::vector<wxString> names;
+  for (size_t i = 0; i < s_assmtParts.size(); i++)
+    names.push_back(wxString(s_assmtParts[i].name));
+  return names;
 }
 
 void GradingTools::LoadScoreSheet(std::string filename, bool build)
@@ -541,15 +589,6 @@ void GradingTools::SaveScoreSheet()
 {
   FILE *f = fopen(m_filename.c_str(), "w+");
 
-  char buffer[512];
-/*
-  sprintf(buffer, "Part %s (%s points total)", m_partString.c_str(), formatFloat(m_maxPoints));
-  fprintf(f, "\n%s\n", buffer);
-
-  for (unsigned int i = 0; i < strlen(buffer); i++)
-    fprintf(f, "-");
-  fprintf(f, "\n");
-*/
   int strInd = 0;
   for (unsigned int i = 0; i < m_categories.size() - 1; i++)
   {
@@ -570,12 +609,7 @@ void GradingTools::SaveScoreSheet()
 
   while (strInd < m_strings.size())
     fprintf(f, "%s\n", m_strings[strInd++].Print().c_str());
-/*
-  fprintf(f, "late penalty for part %s (if any): \n", m_partString.c_str());
-  fprintf(f, "total for part %s: %s\n", m_partString.c_str(), formatFloat(m_totalPoints));
 
-  fprintf(f, "\nTotal: \n");
-*/
   fclose(f);
 
   SaveScoreFile();
@@ -616,10 +650,7 @@ void GradingTools::OpenFiles(bool build)
 
   wxString filename, filter;
 
-  if (m_part == 1)
-    filter = "ps1_partI.txt";
-  else
-    filter = "*.java";
+  filter = s_assmtParts[m_part].submissionFilter;
 
   bool more = dir.GetFirst(&filename, filter, wxDIR_FILES);
   while (more)
@@ -630,12 +661,7 @@ void GradingTools::OpenFiles(bool build)
   }
 
   // Look for the official grade file
-  if (m_part == 1)
-    filter = "*-a.txt";
-  else if (m_part == 2)
-    filter = "*-b.txt";
-  else
-    filter = "*-c.txt";
+  filter = s_assmtParts[m_part].gradeFileFilter;
   if (dir.GetFirst(&filename, filter, wxDIR_FILES))
     m_filename = filename;
   else

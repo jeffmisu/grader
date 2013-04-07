@@ -78,20 +78,22 @@ GraderFrame *GraderFrame::Create(GraderFrame *parentFrame)
 
   GraderFrame *frame = new GraderFrame(NULL, str, wxDefaultPosition, size);
 
-  wxString choices[4] = {"Grade part one", "Grade part two", "Grade part three", "Create a score sheet"};
-  wxSingleChoiceDialog partDlg(frame, "What are we doing here?", "Let me ask you something.", 4, choices, NULL, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxOK);
+  std::vector<wxString> choices = GradingTools::GetAssignmentParts();
+  choices.push_back("Create a score sheet");
+
+  wxSingleChoiceDialog partDlg(frame, "What are we doing here?", "Let me ask you something.", choices.size(), &choices[0], NULL, wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxOK);
 
   if (partDlg.ShowModal() == wxID_CANCEL)
     exit(0);
 
-  int part = partDlg.GetSelection() + 1;
+  int part = partDlg.GetSelection();
 
-  if (part == 4)
+  if (part == choices.size() - 1)
   {
     frame->m_maker = new TemplateMaker(frame->m_panel);
     frame->m_panel->GetSizer()->Add(frame->m_maker, 1, wxEXPAND, 0);
   }
-  else if (part < 4 && part > 0)
+  else if (part < choices.size() - 1 && part >= 0)
   {
     wxFileDialog *fd = new wxFileDialog(NULL, "Find the grading template", "", "", "All files (*.*)|*.*");
     std::string templateFilename;
